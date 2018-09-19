@@ -56,7 +56,7 @@ def performanceCallback(msg):
 #    rospy.loginfo('Lives: {} Score: {} Time: {} PerformEval: {}'.format(msg.lives, msg.score, msg.gtime, msg.performEval) )
     pass
 
-def createM():
+def createM(nm):
     mapArray = np.zeros((-min_Y+max_Y+1,-min_X+max_X+1,3))
     # Add obstacles
     for i in range(len(obstx)):
@@ -88,7 +88,7 @@ def createM():
             mapArray[ghostsPosy[i],ghostsPosx[i],2] = 128
 
     im = Image.fromarray(mapArray.astype(np.uint8))
-    im.save('/home/fulloa10/Documents/AI_Challenge/Imagenes/hh.png')
+    im.save('/home/fulloa10/shared/Pictures/state'+str(nm)+'.png')
 def pacman_controller_py():
 
     rospy.init_node('pacman_controller_py', anonymous=True)
@@ -120,10 +120,13 @@ def pacman_controller_py():
         nm = 0
         rate = rospy.Rate(10) # 10hz
         msg = actions();
+        actfl = open('/home/fulloa10/shared/action.txt','r+')
         while not rospy.is_shutdown():
             if 'y_P' in globals():
-                createM()
-            msg.action = random.choice([0,1,2,3,4]);
+                createM(nm)
+            a = int(actfl.read()[-1])
+            actfl.write('-')
+            msg.action = a;
             pub.publish(msg.action)
             rate.sleep()
             nm+=1
